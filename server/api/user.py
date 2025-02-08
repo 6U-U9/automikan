@@ -42,6 +42,11 @@ unauthorized_exception = HTTPException(
 )
 
 def _authenticate(username: str, password: str) -> User | None:
+    count = User.select().count()
+    if count == 0:
+        user = User(name = username, password = hashlib.sha256(password.encode("utf-8")).hexdigest())
+        user.save()
+        return user
     user: User | None = User.get_or_none(User.name == username)
     if not user:
         return None
@@ -117,18 +122,4 @@ def update_password(item: UserUpdateInput, current_user: User = Depends(get_curr
         )
     user.password = hashlib.sha256(item.password.encode("utf-8")).hexdigest()
     user.save()
-    return {"name": user.name}
-
-@router.post("/init")
-def init():
-    user, create = User.get_or_create(
-        name = "admin",
-        defaults = {
-            "password": hashlib.sha256("password".encode("utf-8")).hexdigest(),
-            "email" : "email"
-        }
-    )
-    if not create:
-        user.password = hashlib.sha256("password".encode("utf-8")).hexdigest()
-        user.save()
     return {"name": user.name}

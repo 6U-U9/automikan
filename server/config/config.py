@@ -35,6 +35,9 @@ class Config(BaseModel):
     save_all_torrent: bool = False # save every ".torrent" file seen
     delete_unreferenced_torrent: bool = False # delete unreferenced torrent
 
+    # Mikan
+    mikan_bangumi_rss_template: str = r"https://mikanime.tv/RSS/Bangumi?bangumiId={mikan_bangumi_id}&subgroupid={provider_id}"
+
     # Download
     bangumi_directory: str = "/bangumi"
     poster_directory: str = "/automikan/poster"

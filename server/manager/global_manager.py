@@ -65,7 +65,7 @@ class GlobalManager():
             GlobalManager.global_cache["title"][title] = mikan_id
     
     def build_title_to_mikan_id_cache():
-        animes = Anime.select()
+        animes = list(Anime.select())
         for anime in animes:
             if anime.mikan_id != None:
                 titles = anime.alternative_title.split("\n")
@@ -76,7 +76,7 @@ class GlobalManager():
             GlobalManager.global_cache["provider"][name] = mikan_id
 
     def build_provider_to_mikan_id_cache():
-        providers = Provider.select()
+        providers = list(Provider.select())
         for provider in providers:
             if provider.mikan_id != None:
                 names = provider.alternative_name.split("\n")

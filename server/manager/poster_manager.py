@@ -9,7 +9,7 @@ from utils.request import Request
 class PosterManager():
     def _download(self):
         query : list[Poster]
-        query = Poster.select().where(Poster.download == False)
+        query = list(Poster.select().where(Poster.download == False))
 
         with Request(GlobalManager.global_config.request_header, GlobalManager.global_config.proxy) as request:
             for poster in query:

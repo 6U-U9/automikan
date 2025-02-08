@@ -118,7 +118,7 @@ class FileManager():
     def run(self):
         torrents : list[Torrent]
 
-        torrents = Torrent.select().where((Torrent.chosen == True) & (Torrent.downloading == True) & (Torrent.finished == False))
+        torrents = list(Torrent.select().where((Torrent.chosen == True) & (Torrent.downloading == True) & (Torrent.finished == False)))
         for torrent in torrents:
             torrent_info = self.downloader.get_torrent_info(torrent)
             if torrent_info and torrent_info.finish:

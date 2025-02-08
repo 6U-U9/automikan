@@ -18,7 +18,7 @@ class DownloadManager():
         torrents : list[Torrent]
 
         # Add torrent to downloader
-        torrents = Torrent.select().where((Torrent.chosen == True) & (Torrent.download == True) & (Torrent.downloading == False))
+        torrents = list(Torrent.select().where((Torrent.chosen == True) & (Torrent.download == True) & (Torrent.downloading == False)))
         for torrent in torrents:
             logger.debug(f"Add torrent {torrent.path} to downloader")
             response = self.downloader.add_torrent(torrent)
@@ -29,7 +29,7 @@ class DownloadManager():
 
         # Remove unwanted download
         if GlobalManager.global_config.remove_covered_download:
-            torrents = Torrent.select().where((Torrent.chosen == False) & (Torrent.downloading == True))
+            torrents = list(Torrent.select().where((Torrent.chosen == False) & (Torrent.downloading == True)))
             for torrent in torrents:
                 logger.debug(f"Remove torrent {torrent.path} from downloader")
                 response = self.downloader.delete_torrent(torrent)

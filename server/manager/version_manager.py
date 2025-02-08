@@ -8,9 +8,9 @@ from fliter.fliter import Fliter
 
 class VersionManager():
     def _select_by_episode(self, anime: Anime, fliter: Fliter):
-        episodes = Episode.select().where(Episode.anime == anime)
+        episodes = list(Episode.select().where(Episode.anime == anime))
         for episode in episodes:
-            episode_versions = EpisodeVersion.select().where(EpisodeVersion.episode == episode)
+            episode_versions = list(EpisodeVersion.select().where(EpisodeVersion.episode == episode))
             versions = [episode_version.version for episode_version in episode_versions]
             chosens = fliter.filter(versions)
             chosen_index = set([version[0] for version in chosens])
@@ -22,11 +22,11 @@ class VersionManager():
                 episode_versions[index].torrent.save()
     
     def _select_by_anime(self, anime: Anime, fliter: Fliter):
-        versions = AnimeVersion.select().where(AnimeVersion.anime == anime)
+        versions = list(AnimeVersion.select().where(AnimeVersion.anime == anime))
         chosen_versions = [version[1] for version in fliter.filter(versions)]
-        episodes = Episode.select().where(Episode.anime == anime)
+        episodes = list(Episode.select().where(Episode.anime == anime))
         for episode in episodes:
-            episode_versions = EpisodeVersion.select().where(EpisodeVersion.episode == episode)
+            episode_versions = list(EpisodeVersion.select().where(EpisodeVersion.episode == episode))
             for version in episode_versions:
                 if version.version in chosen_versions:
                     version.torrent.chosen = True

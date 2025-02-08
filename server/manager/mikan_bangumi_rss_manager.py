@@ -29,7 +29,7 @@ class MikanBangumiRssManager():
             }
         )
         
-        query = Provider.select().where(Provider.mikan_id == episode_info["mikan_subgroup_id"])
+        query = list(Provider.select().where(Provider.mikan_id == episode_info["mikan_subgroup_id"]))
         if len(query) == 0:
             provider = Provider(
                 mikan_id = episode_info["mikan_subgroup_id"],
@@ -48,10 +48,10 @@ class MikanBangumiRssManager():
         return episode_info
 
     def run(self):
-        bangumi_rss = Subscription.select().where(
+        bangumi_rss = list(Subscription.select().where(
             (Subscription.source == "mikan") & 
             (Subscription.aggregate == False)
-        )
+        ))
         title_cache : dict = GlobalManager.global_cache.get("title")
         provider_cache : dict = GlobalManager.global_cache.get("provider")
         episode_info : dict = None
@@ -86,7 +86,7 @@ class MikanBangumiRssManager():
                         provider_id = episode_info["mikan_subgroup_id"]
                     provider = Provider.get(Provider.mikan_id == provider_id)
                     # get anime version
-                    query = AnimeVersion.select().where(
+                    query = list(AnimeVersion.select().where(
                         (AnimeVersion.anime == anime) & 
                         (AnimeVersion.provider == provider) &
                         (AnimeVersion.format == info["torrent_title"]["format"]) &
@@ -96,7 +96,7 @@ class MikanBangumiRssManager():
                         (AnimeVersion.source == info["torrent_title"]["source"]) &
                         (AnimeVersion.subtitle_language == info["torrent_title"]["subtitle_language"]) &
                         (AnimeVersion.subtitle_hardcoded == info["torrent_title"]["subtitle_hardcoded"])
-                    )
+                    ))
                     if len(query) > 0:
                         anime_version = query[0]
                     else:
@@ -127,10 +127,10 @@ class MikanBangumiRssManager():
                             index = index, 
                             special = info["torrent_title"]["special"]
                         )
-                        query : list[EpisodeVersion] = EpisodeVersion.select().where(
+                        query : list[EpisodeVersion] = list(EpisodeVersion.select().where(
                             (EpisodeVersion.version == anime_version) & 
                             (EpisodeVersion.episode == episode)
-                        )
+                        ))
                         if len(query) > 0:
                             logger.error(f"Duplicate version of same episode: {model_to_json(query[0])}")
                             continue

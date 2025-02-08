@@ -34,7 +34,7 @@ class MikanAggregateRssManager():
             }
         )
         
-        query = Provider.select().where(Provider.mikan_id == episode_info["mikan_subgroup_id"])
+        query = list(Provider.select().where(Provider.mikan_id == episode_info["mikan_subgroup_id"]))
         if len(query) == 0:
             provider = Provider(
                 mikan_id = episode_info["mikan_subgroup_id"],
@@ -53,11 +53,11 @@ class MikanAggregateRssManager():
         return episode_info
 
     def add_bangumi_subgroup_rss(self, mikan_bangumi_id: int, provider_id: int):
-        url = f"https://mikanani.me/RSS/Bangumi?bangumiId={mikan_bangumi_id}&subgroupid={provider_id}"
+        url = GlobalManager.global_config.mikan_bangumi_rss_template.format(mikan_bangumi_id = mikan_bangumi_id, provider_id = provider_id)
         try:
             rss, created = Subscription.get_or_create(
                         url = url,
-                        type = "mikan",
+                        source = "mikan",
                         aggregate = False,
                         defaults = {
                             "auto": True,
@@ -71,10 +71,10 @@ class MikanAggregateRssManager():
 
     def run(self):
         # with Storage(GlobalManager.global_config.database, GlobalManager.global_config.database_name, GlobalManager.global_config.database_pragmas) as storage:
-        mybungumi_rss = Subscription.select().where(
+        mybungumi_rss = list(Subscription.select().where(
             (Subscription.source == "mikan") & 
             (Subscription.aggregate == True)
-        )
+        ))
         title_cache : dict = GlobalManager.global_cache.get("title")
         provider_cache : dict = GlobalManager.global_cache.get("provider")
         episode_info : dict = None
@@ -106,7 +106,7 @@ class MikanAggregateRssManager():
                         provider_id = episode_info["mikan_subgroup_id"]
                     provider: Provider = Provider.get(Provider.mikan_id == provider_id)
                     # get anime version
-                    query = AnimeVersion.select().where(
+                    query = list(AnimeVersion.select().where(
                         (AnimeVersion.anime == anime) & 
                         (AnimeVersion.provider == provider) &
                         (AnimeVersion.format == info["torrent_title"]["format"]) &
@@ -116,7 +116,7 @@ class MikanAggregateRssManager():
                         (AnimeVersion.source == info["torrent_title"]["source"]) &
                         (AnimeVersion.subtitle_language == info["torrent_title"]["subtitle_language"]) &
                         (AnimeVersion.subtitle_hardcoded == info["torrent_title"]["subtitle_hardcoded"])
-                    )
+                    ))
                     # add subscription by bangumi and subgroup 
                     self.add_bangumi_subgroup_rss(anime.mikan_id, provider.mikan_id)
                     if len(query) > 0:
@@ -149,10 +149,10 @@ class MikanAggregateRssManager():
                             index = index, 
                             special = info["torrent_title"]["special"]
                         )
-                        query : list[EpisodeVersion] = EpisodeVersion.select().where(
+                        query : list[EpisodeVersion] = list(EpisodeVersion.select().where(
                             (EpisodeVersion.version == anime_version) & 
                             (EpisodeVersion.episode == episode)
-                        )
+                        ))
                         if len(query) > 0:
                             logger.error(f"Duplicate version of same episode: {model_to_json(query[0])}")
                             continue

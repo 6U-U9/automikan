@@ -12,9 +12,9 @@ class TorrentManager():
     def _download(self):
         query : list[Torrent]
         if GlobalManager.global_config.save_all_torrent:
-            query = Torrent.select().where(Torrent.download == False)
+            query = list(Torrent.select().where(Torrent.download == False))
         else:
-            query = Torrent.select().where((Torrent.chosen == True) & (Torrent.download == False))
+            query = list(Torrent.select().where((Torrent.chosen == True) & (Torrent.download == False)))
         
         with Request(GlobalManager.global_config.request_header, GlobalManager.global_config.proxy) as request:
             for torrent in query:
@@ -31,7 +31,7 @@ class TorrentManager():
 
     def _delete(self):
         if GlobalManager.global_config.delete_unreferenced_torrent:
-            query = Torrent.select().where((Torrent.chosen == False) & (Torrent.download == True))
+            query = list(Torrent.select().where((Torrent.chosen == False) & (Torrent.download == True)))
             for torrent in query:
                 os.remove(torrent.path)
                 torrent.download = False

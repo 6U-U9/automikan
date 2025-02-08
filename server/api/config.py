@@ -26,6 +26,9 @@ class ConfigBaseModel(BaseModel):
     save_all_torrent: bool | None
     delete_unreferenced_torrent: bool | None
 
+    # Mikan
+    mikan_bangumi_rss_template: str | None
+
     # Download
     bangumi_directory: str | None
     poster_directory: str | None

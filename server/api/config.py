@@ -59,6 +59,14 @@ class ConfigBaseModel(BaseModel):
     pattern_title_exclude_front: list[str] | None 
     pattern_title_exclude_back: list[str] | None
     pattern_title_exclude_char: str | None
+
+    # AI
+    enable_ai_parser: bool | None
+    ai_proxy_url: str | None
+    ai_api_key: str | None
+    ai_base_url: str | None
+    ai_model: str | None
+    ai_prompt: str | None
     
     # Fliter
     default_fliter_rule: dict[str, Any] | None

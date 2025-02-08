@@ -1,0 +1,31 @@
+# Todo:
+## Urgent
+1. API
+    1. Get Anime List
+    2. Delete Anime (Do not care if will be added again)
+    3. Get Episode, Version, Poster, etc by Anime
+    4. Edit fliter_rule, naming_format, season of Anime
+    5. ~~Add RSS & Delete RSS~~
+    6. Edit global config & restart service
+2. Front End
+3. Docker 
+4. Write default exclude rule, naming format
+5. Update common providers, etc
+6. Add title parsing for special episode and more
+
+## Next
+1. After changing naming_format of Anime, files already named shall be rename
+2. Add enough logging and try-catch for debug
+3. SSL Support
+4. Check for dead torrent and choose another version
+5. Rewrite request module
+6. Enbed video player
+
+## Future
+1. Support other website
+2. Gather meta data of anime
+
+## Not Sure
+1. Multiple user
+
+

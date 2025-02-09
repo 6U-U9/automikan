@@ -49,7 +49,8 @@ class MikanAggregateRssManager():
                 names.append(episode_info["mikan_subgroup_name"])
                 provider.alternative_name = "\n".join(names)
                 provider.save()
-        
+
+        logger.debug(f"Get torrent info from website: Anime: {model_to_json(anime)}, Provider: {model_to_json(provider)}")
         return episode_info
 
     def add_bangumi_subgroup_rss(self, mikan_bangumi_id: int, provider_id: int):
@@ -70,28 +71,33 @@ class MikanAggregateRssManager():
             logger.error(f"Add Mikan RSS failed: {url}, {e}")
 
     def run(self):
-        # with Storage(GlobalManager.global_config.database, GlobalManager.global_config.database_name, GlobalManager.global_config.database_pragmas) as storage:
         mybungumi_rss = list(Subscription.select().where(
             (Subscription.source == "mikan") & 
             (Subscription.aggregate == True)
         ))
         title_cache : dict = GlobalManager.global_cache.get("title")
         provider_cache : dict = GlobalManager.global_cache.get("provider")
-        episode_info : dict = None
+        
         with Request(GlobalManager.global_config.request_header, GlobalManager.global_config.proxy) as request:
             for rss in mybungumi_rss:
                 rss_response = request.get(rss.url)
+                if rss_response == None:
+                    logger.warning(f"Can not connect to {rss.url}")
+                    return
                 rss_infos = MikanRssParser.parse(rss_response.text)
                 for info in rss_infos:
+                    episode_info : dict = None
                     # get anime
                     anime_id = -1
                     # for that we cache alternative titles, do not use fuzzy match here
                     for title in info["torrent_title"]["titles"]:
                         if title in title_cache:
+                            logger.debug(f"Found anime {title} in cache, value {title_cache[title]}")
                             anime_id = title_cache[title]
                             break
                     if anime_id == -1:
                         # get mikan id from website
+                        logger.debug(f"Found new anime {info['torrent_title']['titles']}, get info from website")
                         episode_info = self.get_torrent_html_info(episode_info, request, info)
                         anime_id = episode_info["mikan_bangumi_id"]
                     for title in info["torrent_title"]["titles"]:
@@ -102,8 +108,10 @@ class MikanAggregateRssManager():
                     if info["torrent_title"]["provider"] in provider_cache:
                         provider_id = provider_cache[info["torrent_title"]["provider"]]
                     if provider_id == -1:
+                        logger.debug(f"Found new provider {info['torrent_title']['provider']}, get info from website")
                         episode_info = self.get_torrent_html_info(episode_info, request, info)
                         provider_id = episode_info["mikan_subgroup_id"]
+                    provider_cache[info["torrent_title"]["provider"]] = provider_id
                     provider: Provider = Provider.get(Provider.mikan_id == provider_id)
                     # get anime version
                     query = list(AnimeVersion.select().where(
@@ -154,7 +162,8 @@ class MikanAggregateRssManager():
                             (EpisodeVersion.episode == episode)
                         ))
                         if len(query) > 0:
-                            logger.error(f"Duplicate version of same episode: {model_to_json(query[0])}")
+                            # Todo: check if there is a revised version
+                            logger.debug(f"Duplicate version of same episode: {model_to_json(query[0])}")
                             continue
                         if len(query) == 1 and query[0].torrent != torrent:
                             logger.warning(f"Found different torrent for same episode version: {model_to_json(query[0])} found new torrent {model_to_json(torrent)}")

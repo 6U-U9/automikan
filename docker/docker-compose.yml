@@ -23,7 +23,7 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile-server
-    image: automikan-server
+    image: 6uau9/automikan:latest
     container_name: automikan-server
     environment:
       - PUID=1000

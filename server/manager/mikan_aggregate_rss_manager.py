@@ -44,7 +44,7 @@ class MikanAggregateRssManager():
             provider.save()
         else:
             provider = query[0]
-            names = provider.alternative_name.split()
+            names = provider.alternative_name.split("\n")
             if episode_info["mikan_subgroup_name"] not in names:
                 names.append(episode_info["mikan_subgroup_name"])
                 provider.alternative_name = "\n".join(names)

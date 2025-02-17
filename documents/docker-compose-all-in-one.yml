@@ -1,0 +1,52 @@
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent-automikan
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    volumes:
+      - /path/to/qbittorrent/appdata:/config
+      - /path/to/downloads:/bangumi/downloads
+    ports:
+      - 8080:8080
+      - 6881:6881/tcp
+      - 6881:6881/udp
+    networks:
+      - automikan
+    restart: unless-stopped
+
+  automikan-server:
+    image: 6uau9/automikan:latest
+    container_name: automikan-server
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /path/to/bangumi:/bangumi
+      - /path/to/torrents:/torrents
+      - /path/to/automikan:/automikan
+    ports:
+      - 8236:8236
+    networks:
+      - automikan
+    restart: unless-stopped
+
+  automikan-web:
+    image: 6uau9/automikan-web:latest
+    container_name: automikan-web
+    environment:
+      - API_BASE_URL="http://automikan-server:8236"
+    ports:
+      - 8237:8237
+    networks:
+      - automikan
+    restart: unless-stopped
+
+networks:
+  automikan:
+    name: automikan
+    driver: bridge

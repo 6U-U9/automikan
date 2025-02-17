@@ -85,14 +85,14 @@ docker-compose up -d
 ```sh
 docker logs qbittorrent-automikan  
 ```  
-2. 使用浏览器访问 http://localhost:8080； 使用 admin 以及初始密码登录
+2. 使用浏览器访问 [http://localhost:8080](http://localhost:8080)； 使用 admin 以及初始密码登录
 
 3. 进入设置界面：  
     1. 修改密码  
     2. 修改默认下载路径为 /bangumi/downloads
 
 #### 5. 设置 automikan  
-1. 使用浏览器访问 http://localhost:8237；第一次登陆可以使用任意用户名和密码，automikan 将创建该用户
+1. 使用浏览器访问 [http://localhost:8237](http://localhost:8237)；第一次登陆可以使用任意用户名和密码，automikan 将创建该用户
 2. 进入设置界面：
     1. 修改 qbittorrent 部分的用户名和密码
     2. 点击下方 save 按钮保存
@@ -103,13 +103,13 @@ docker logs qbittorrent-automikan
 ##### 1. 聚合 RSS
 1. 注册账号，订阅想看的番剧
 2. 进入订阅选项卡，复制右下角 RSS 图标的链接
-3. 在 http://localhost:8237 Subscription 选项卡中新建订阅
+3. 在 [http://localhost:8237](http://localhost:8237) Subscription 选项卡中新建订阅
 4. 粘贴刚才的链接并保存
 ##### 2. 番剧 RSS
 1. 进入任一番剧页面
 2. 选择喜欢的字幕组
 3. 右键点击右侧的橙色 RSS 图标，复制链接
-4. 在 http://localhost:8237 Subscription 选项卡中新建订阅 
+4. 在 [http://localhost:8237](http://localhost:8237) Subscription 选项卡中新建订阅 
 5. 粘贴链接，取消勾选 aggregate，保存  
 
 #### 7. 等待下载完成  

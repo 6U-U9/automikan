@@ -23,6 +23,7 @@ class Subscription(BaseModel):
     url = CharField(unique = True)
     
     auto = BooleanField(default = False)
+    enable = BooleanField(default = True)
     
     create_time = DateTimeField(default = datetime.datetime.now())
     update_time = DateTimeField(default = datetime.datetime.now())

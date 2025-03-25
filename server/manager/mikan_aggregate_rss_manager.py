@@ -73,7 +73,8 @@ class MikanAggregateRssManager():
     def run(self):
         mybungumi_rss = list(Subscription.select().where(
             (Subscription.source == "mikan") & 
-            (Subscription.aggregate == True)
+            (Subscription.aggregate == True) &
+            (Subscription.enable == True)
         ))
         title_cache : dict = GlobalManager.global_cache.get("title")
         provider_cache : dict = GlobalManager.global_cache.get("provider")
@@ -103,6 +104,9 @@ class MikanAggregateRssManager():
                     for title in info["torrent_title"]["titles"]:
                         title_cache[title] = anime_id
                     anime: Anime = Anime.get(Anime.mikan_id == anime_id)
+                    anime.update_time = datetime.datetime.now()
+                    anime.save()
+                    logger.debug(f"Update anime {anime.title} last update time to {anime.update_time}")
                     # get provider
                     provider_id = -1
                     if info["torrent_title"]["provider"] in provider_cache:

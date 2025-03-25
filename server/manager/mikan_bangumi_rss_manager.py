@@ -51,7 +51,8 @@ class MikanBangumiRssManager():
     def run(self):
         bangumi_rss = list(Subscription.select().where(
             (Subscription.source == "mikan") & 
-            (Subscription.aggregate == False)
+            (Subscription.aggregate == False) & 
+            (Subscription.enable == True)
         ))
         title_cache : dict = GlobalManager.global_cache.get("title")
         provider_cache : dict = GlobalManager.global_cache.get("provider")
@@ -63,6 +64,7 @@ class MikanBangumiRssManager():
                     logger.warning(f"Can not connect to {rss.url}")
                     return
                 rss_infos = MikanRssParser.parse(rss_response.text)
+                found_new_episode_version = False
                 for info in rss_infos:
                     episode_info : dict = None
                     # get anime
@@ -150,5 +152,14 @@ class MikanBangumiRssManager():
                             torrent = torrent,
                             update_time = datetime.datetime.now()
                         )
+                        found_new_episode_version = True
                         episode_version.save()
+                if found_new_episode_version:
+                    anime.update_time = datetime.datetime.now()
+                    anime.save()
+                    logger.debug(f"Update anime {anime.title} last update time to {anime.update_time}")
+                elif anime.update_time < datetime.datetime.now() - GlobalManager.global_config.version_check_timeout:
+                    rss.enable = False
+                    rss.save()
+                    logger.debug(f"Mikan bangumi RSS {rss.url} is disabled because no new episode found since {anime.update_time}")
 

@@ -25,7 +25,8 @@ class MikanTorrentHtmlParser(Parser):
         mikan_bangumi_url = soup.css.select(".bangumi-title")[0].a["href"]
         mikan_bangumi_id = mikan_bangumi_url.split("/")[3].split("#")[0]
         mikan_subgroup_id = mikan_bangumi_url.split("/")[3].split("#")[1]
-        mikan_subgroup_name = soup.css.select(".dropdown-toggle.material-dropdown__btn")[0].find('span', class_='magnet-link-wrap').find('span').text
+        ## For multiple subgroups, html is different than single one
+        mikan_subgroup_name = soup.css.select(".magnet-link-wrap")[0].text.strip()
         ## Do not parse because it will get something like "昨天 10:01"
         # torrent_publish_time = datetime.strptime(soup.css.select(".bangumi-info")[1].text.split("：")[1], date_format)
 
@@ -41,7 +42,8 @@ class MikanTorrentHtmlParser(Parser):
 
 if __name__ == "__main__":
     import requests
-    url = "https://mikanani.me/Home/Episode/29fefa115abf38fcfe697d7212a470b40814b958"
+    url_multi_subgroups = "https://mikanani.me/Home/Episode/29fefa115abf38fcfe697d7212a470b40814b958"
+    url_single_subgroups = "https://mikanani.me/Home/Episode/80220ac32c48d24ebf82821f964542feacadfa18"
     session = requests.Session()
     req = session.get(url = url)
     print(MikanTorrentHtmlParser.parse(req.text))

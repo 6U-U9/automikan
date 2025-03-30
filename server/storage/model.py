@@ -67,6 +67,7 @@ class Anime(BaseModel):
     update_time = DateTimeField(default = datetime.datetime.now())
     fliter_rule = TextField(default = "")
     naming_format = TextField(default = "")
+    path_naming_format = TextField(default = "")
     finished = BooleanField(default = False)
 
 class AnimeVersion(BaseModel):

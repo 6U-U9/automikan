@@ -41,7 +41,15 @@ class FileManager():
             logger.error(f"Torrent {model_to_json(torrent)} has no episode version")
             return False
         anime = episode_versions[0].episode.anime
-        hard_link_directory = os.path.join(GlobalManager.global_config.bangumi_directory, anime.title)
+        path_naming_format = anime.path_naming_format
+        if path_naming_format == "":
+            path_naming_format = GlobalManager.global_config.global_path_naming_format
+        path_name = path_naming_format.format(
+                title = anime.title,
+                season = anime.season
+            )
+        hard_link_directory = os.path.join(GlobalManager.global_config.bangumi_directory, path_name)
+        logger.debug(f"Check {anime.title} folder structure {hard_link_directory}")
         if not os.path.exists(hard_link_directory):
             os.makedirs(hard_link_directory)
 
@@ -123,3 +131,4 @@ class FileManager():
             torrent_info = self.downloader.get_torrent_info(torrent)
             if torrent_info and torrent_info.finish:
                 self.create_hard_link(torrent, torrent_info.path)
+                logger.info(f"Create hard link for {torrent.name}")

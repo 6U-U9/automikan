@@ -41,6 +41,7 @@ class Config(BaseModel):
     # Download
     bangumi_directory: str = "/bangumi"
     poster_directory: str = "/automikan/poster"
+    global_path_naming_format: str = r"{title}/Season {season:02d}"
     global_naming_format: str = r"{title} - S{season:02d}E{index:02d}"
     select_by_episode: bool = True # False: select_by_anime
     remove_covered_download: bool = True # Remove download which has a better version
@@ -106,7 +107,7 @@ class Config(BaseModel):
         ),# Todo
         "multiple_index": Pattern(
             common_pattern = None,
-            unknown_pattern = r'(?i)(\d+)\s*-\s*(\d+)',
+            unknown_pattern = r'(?i)\[(\d+)\s*-\s*(\d+)\]|\[(\d+)\s*-\s*(\d+)\s*合集\]',
             reverse_match = False,
             ignore_case = True,
         ), 

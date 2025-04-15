@@ -39,12 +39,15 @@ class MikanAggregateRssManager():
             provider = Provider(
                 mikan_id = episode_info["mikan_subgroup_id"],
                 name = episode_info["mikan_subgroup_name"],
-                alternative_name = episode_info["mikan_subgroup_name"]
+                alternative_name = episode_info["mikan_subgroup_name"] if episode_info["mikan_subgroup_name"] else info["torrent_title"]["provider"]
             )
             provider.save()
         else:
             provider = query[0]
             names = provider.alternative_name.split("\n")
+            if provider.name == "":
+                provider.name = episode_info["mikan_subgroup_name"]
+                provider.save()
             if episode_info["mikan_subgroup_name"] not in names:
                 names.append(episode_info["mikan_subgroup_name"])
                 provider.alternative_name = "\n".join(names)
@@ -85,8 +88,10 @@ class MikanAggregateRssManager():
                 if rss_response == None:
                     logger.warning(f"Can not connect to {rss.url}")
                     return
+                logger.info(f"Get Aggregate info from {rss.url}")
                 rss_infos = MikanRssParser.parse(rss_response.text)
                 for info in rss_infos:
+                    logger.debug(f"Get parsed rss info {info}")
                     episode_info : dict = None
                     # get anime
                     anime_id = -1

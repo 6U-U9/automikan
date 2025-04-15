@@ -15,24 +15,35 @@ class Fliter:
                 rules = json.loads(rules)
         except Exception as e:
             logger.error(f"Cannot parse rules {rules}, please check the format")
+            logger.debug(e, stack_info = True, exc_info = True)
         self.rules = rules
         self.remain = self.rules["remain"]
 
+    def _get_nested_attr(self, obj, attr_path):
+        """
+        根据 "a.b.c" 的路径，递归获取嵌套属性或字典键值
+        支持混合对象属性和字典属性
+        """
+        for attr in attr_path.split('.'):
+            try:
+                # 先尝试用对象属性方式访问
+                obj = getattr(obj, attr)
+            except AttributeError:
+                try:
+                    # 如果失败，则尝试用字典键方式访问
+                    obj = obj[attr]
+                except (KeyError, TypeError):
+                    return null
+        return obj
+
     def _check(self, rule: dict, item: Any) -> bool:
         if rule["operator"] == "equal":
-            if type(item) == dict:
-                return item[rule["field"]] == rule["value"]
-            else:
-                return getattr(item, rule["field"]) == rule["value"]
+            return self._get_nested_attr(item, rule["field"]) == rule["value"]
         if rule["operator"] == "has":
-            if type(item) == dict:
-                if item[rule["field"]] == None:
-                    return False
-                return rule["value"] in item[rule["field"]]
-            else:
-                if getattr(item, rule["field"]) == None:
-                    return False
-                return rule["value"] in getattr(item, rule["field"])
+            attr = self._get_nested_attr(item, rule["field"])
+            if attr == None:
+                return False
+            return rule["value"] in attr
         if rule["operator"] == "not":
             return not self._check(rule["value"], item)
         if rule["operator"] == "and":
@@ -40,10 +51,11 @@ class Fliter:
         if rule["operator"] == "or":
             return self._check(rule["value"][0], item) or self._check(rule["value"][1], item) 
 
-    def filter(self, input: list[Any]) -> list[tuple[int, Any]]:
-        output = [(index, item) for index, item in enumerate(input)]
+    def filter(self, inputs: list[Any]) -> list[tuple[int, Any]]:
+        output = [(index, item) for index, item in enumerate(inputs)]
         try:
             for rule in self.rules["rules"]:
+                logger.debug(f"filter {rule} apply to {len(output)} inputs")
                 match rule["type"]:
                     case "include":
                         temp = []
@@ -54,7 +66,7 @@ class Fliter:
                             output = temp
                     case "exclude":
                         temp = []
-                        for index, item in enumerate(input):
+                        for index, item in output:
                             if not self._check(rule, item):
                                 temp.append((index, item))
                         if len(temp) >= self.remain:
@@ -64,5 +76,4 @@ class Fliter:
         except Exception as e:
             logger.error(f"Cannot parse rules {self.rules}, please check the format")
             logger.debug(e, stack_info = True, exc_info = True) 
-
         return output[:self.remain]

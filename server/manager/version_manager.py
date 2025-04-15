@@ -2,6 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 import datetime
 
+from utils.string import model_to_json
 from storage.model import Anime, AnimeVersion, Episode, EpisodeVersion
 from manager.global_manager import GlobalManager
 from fliter.fliter import Fliter
@@ -17,6 +18,7 @@ class VersionManager():
             for index, version in enumerate(episode_versions):
                 if index in chosen_index:
                     episode_versions[index].torrent.chosen = True
+                    logger.debug(f"Choose Version: {model_to_json(episode_versions[index])}")
                 else:
                     episode_versions[index].torrent.chosen = False
                 episode_versions[index].torrent.save()
@@ -43,7 +45,3 @@ class VersionManager():
                 self._select_by_episode(anime, fliter)
             else:
                 self._select_by_anime(anime, fliter)
-
-            
-
-            

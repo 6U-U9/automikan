@@ -87,7 +87,7 @@ class AnimeVersion(BaseModel):
     # finished = BooleanField(default = False)
 
 class Episode(BaseModel):
-    id = IntegerField(primary_key =  True)
+    id = IntegerField(primary_key = True)
     anime = ForeignKeyField(Anime, backref = "episode")
     index = IntegerField(default = 0)
     # when index set to 0, it is a special episode

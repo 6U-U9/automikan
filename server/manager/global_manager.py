@@ -2,6 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 import os
 import argparse
+from datetime import datetime
 
 import asyncio
 from contextlib import asynccontextmanager
@@ -142,7 +143,7 @@ class GlobalManager():
 
         GlobalManager.scheduler = AsyncIOScheduler()
         trigger = IntervalTrigger(minutes = GlobalManager.global_config.background_job_interval)
-        GlobalManager.job = GlobalManager.scheduler.add_job(GlobalManager.background_task, trigger)
+        GlobalManager.job = GlobalManager.scheduler.add_job(GlobalManager.background_task, trigger, next_run_time = datetime.now())
 
         GlobalManager.app = FastAPI(lifespan = GlobalManager.lifespan, debug = GlobalManager.global_config.return_detail_error_info)
         GlobalManager.app.add_middleware(

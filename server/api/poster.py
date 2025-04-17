@@ -49,7 +49,7 @@ def upload_poster(anime_id: int = Form(), file: UploadFile = File(...), current_
     file_path = save_uploaded_file(file)
     poster = Poster.create(
         url = "file://" + file_path, 
-        path = file_path, 
+        path = file.filename, 
         download = True
     )
     poster.save()
@@ -102,7 +102,7 @@ def delete_poster(poster_id: int, current_user: User = Depends(get_current_user)
             detail = "Poster not found."
         )
     
-    file_path = poster.path
+    file_path = os.path.join(GlobalManager.global_config.poster_directory, poster.path)
     if file_path and os.path.exists(file_path):
         os.remove(file_path)
         logger.debug("File deleted successfully from server: %s", file_path)
@@ -127,7 +127,7 @@ def delete_posters_by_anime(anime_id: int, current_user: User = Depends(get_curr
 
         if anime.poster:
             poster = anime.poster
-            file_path = poster.path
+            file_path = os.path.join(GlobalManager.global_config.poster_directory, poster.path)
             if file_path and os.path.exists(file_path):
                 os.remove(file_path)
                 logger.debug("File deleted successfully from server: %s", file_path)
@@ -159,7 +159,7 @@ def get_poster(poster_id: int, current_user: User = Depends(get_current_user)):
             detail = "Poster not found."
         )
     
-    file_path = poster.path
+    file_path = os.path.join(GlobalManager.global_config.poster_directory, poster.path)
 
     if not os.path.exists(file_path):
         logger.error("Poster file not found at path: {file_path}")
@@ -199,7 +199,7 @@ def get_poster_by_anime(anime_id: int, current_user: User = Depends(get_current_
             detail = f"No poster found for Anime {anime_id}"
         )
 
-    file_path = anime.poster.path
+    file_path = os.path.join(GlobalManager.global_config.poster_directory, anime.poster.path)
     if not os.path.exists(file_path):
         logger.error("Poster file not found at path: {file_path}")
         raise HTTPException(

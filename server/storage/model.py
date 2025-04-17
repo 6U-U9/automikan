@@ -47,6 +47,7 @@ class Poster(BaseModel):
     url = CharField(unique = True)
     path = CharField(unique = True, null = True)
     download = BooleanField(default = False)
+    link = BooleanField(default = False)
 
 class Provider(BaseModel):
     id = IntegerField(primary_key = True)

@@ -39,8 +39,8 @@ class Config(BaseModel):
     mikan_bangumi_rss_template: str = r"https://mikanime.tv/RSS/Bangumi?bangumiId={mikan_bangumi_id}&subgroupid={provider_id}"
 
     # Download
-    bangumi_directory: str = "/bangumi"
-    poster_directory: str = "/automikan/poster"
+    bangumi_directory: str = "/data/bangumi"
+    poster_directory: str = "/data/poster"
     global_path_naming_format: str = r"{title}/Season {season:02d}"
     global_naming_format: str = r"{title} - S{season:02d}E{index:02d}"
     select_by_episode: bool = True # False: select_by_anime

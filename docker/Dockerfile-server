@@ -4,6 +4,13 @@ RUN apt-get update
 RUN apt-get install -y tini gosu
 RUN pip install --upgrade pip
 
+RUN mkdir /torrent
+RUN mkdir /data
+RUN mkdir /data/bangumi
+RUN mkdir /data/downloads
+RUN mkdir /data/poster
+RUN mkdir /automikan
+
 WORKDIR /server
 COPY ./server/requirements.txt /server/requirements.txt
 RUN pip install --no-cache-dir -r /server/requirements.txt
@@ -11,6 +18,6 @@ COPY docker/entrypoint-server.sh /entrypoint.sh
 COPY ./server/ /server
 
 EXPOSE 8236
-VOLUME [ "/torrent" , "/bangumi", "/automikan" ]
+VOLUME [ "/torrent" , "/data", "/automikan" ]
 
 ENTRYPOINT ["tini", "-g", "--", "/entrypoint.sh"]
